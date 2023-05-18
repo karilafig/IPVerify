@@ -1,7 +1,4 @@
 import time
-import requests
-import re
-import subprocess
 import argparse
 
 print("  ___ ______     __        _  __     ")
@@ -11,22 +8,38 @@ print("  | ||  __/ \ V /  __/ |  | |  _| |_| | ")
 print(" |___|_|     \_/ \___|_|  |_|_|  \__, |")
 print("                                  |___/")
 
-#----------------------------VARIAVEIS GLOBAIS----------------------------------
-API_KEY_BUFFER_VT = ""
-LAST_UPDATE_VT = 0
-API_KEY_BUFFER_IPDB = ""
-LAST_UPDATE_IPDB = 0
-TXT_FILE = []
+#----------------------------CLASSE DE VERIFICACAO DE API------------------------------
+class APIVerifier:
+    def __init__(self):
+        self.api_key_vt = ""
+        self.last_update_vt = 0
+        self.api_key_ipdb = ""
+        self.last_update_ipdb = 0
+
+    def check_virustotal_api(self):
+        if self.api_key_vt and time.time() - self.last_update_vt < 1800:
+            return self.api_key_vt
+
+        self.api_key_vt = input("Digite a chave de API do VirusTotal: ")
+        self.last_update_vt = time.time()
+        return self.api_key_vt
+
+    def check_abuseipdb_api(self):
+        if self.api_key_ipdb and time.time() - self.last_update_ipdb < 1800:
+            return self.api_key_ipdb
+
+        self.api_key_ipdb = input("Digite a chave de API do AbuseIPDB: ")
+        self.last_update_ipdb = time.time()
+        return self.api_key_ipdb
 
 #----------------------------FUNCOES---------------------------------------------
-
 def ler_arquivo(caminho):
-    global TXT_FILE
     try:
         with open(caminho, "r") as arquivo:
-            TXT_FILE = arquivo.readlines()
+            return arquivo.readlines()
     except FileNotFoundError:
         print("Arquivo não encontrado.")
+        return []
 
 def verify():
     global TXT_FILE
@@ -42,19 +55,17 @@ parser.add_argument("-f", "--file", help="Arquivo de texto com informações de 
 
 args = parser.parse_args()
 
+api_verifier = APIVerifier()
+
 # Verifica se foi fornecida a chave de API do VirusTotal
 if args.virustotalapi:
-    API_KEY_BUFFER_VT = args.virustotalapi
+    api_key_vt = args.virustotalapi
+else:
+    api_key_vt = api_verifier.check_virustotal_api()
 
 # Verifica se foi fornecida a chave de API do AbuseIPDB
 if args.abuseipdbapi:
-    API_KEY_BUFFER_IPDB = args.abuseipdbapi
+    api_key_ipdb = args.abuseipdbapi
+else:
+    api_key_ipdb = api_verifier.check_abuseip
 
-# Verifica se foi fornecido um arquivo de texto com informações de IPs
-if args.file:
-    ler_arquivo(args.file)
-    if TXT_FILE:
-        # Faça o processamento com o array TXT_FILE
-        verify()
-    else:
-        print("Arquivo vazio ou não encontrado.")
