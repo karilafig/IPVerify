@@ -17,6 +17,7 @@ API_KEY_BUFFER_VT= ""
 LAST_UPDATE_VT = 0
 API_KEY_BUFFER_IPDB= ""
 LAST_UPDATE_IPDB = 0
+TXT_FILE = []
 #----------------------------FUNCOES---------------------------------------------
 
 
@@ -34,12 +35,12 @@ args = parser.parse_args()
 
 # Verifica se foi fornecida a chave de API do VirusTotal
 if args.virustotalapi:
-    configurar_chave_virustotal(args.virustotalapi)
+    API_KEY_BUFFER_VT = args.virustotalapi
 
 # Verifica se foi fornecida a chave de API do AbuseIPDB
 if args.abuseipdbapi:
-    configurar_chave_abuseipdb(args.abuseipdbapi)
+    API_KEY_BUFFER_IPDB = args.abuseipdbapi
 
 # Verifica se foi fornecido um arquivo de texto com informações de IPs
 if args.file:
-    processar_arquivo_ips(args.file)
+    
