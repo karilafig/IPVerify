@@ -7,7 +7,8 @@ print("  | || |_) \ \ / / _ \ '__| | |_| | | |")
 print("  | ||  __/ \ V /  __/ |  | |  _| |_| | ")
 print(" |___|_|     \_/ \___|_|  |_|_|  \__, |")
 print("                                  |___/")
-
+#----------------------------VARIÁVEIS GLOBAIS------------------------------
+TXT_FILE = []
 #----------------------------CLASSE DE VERIFICACAO DE API------------------------------
 class APIVerifier:
     def __init__(self):
@@ -68,4 +69,13 @@ if args.abuseipdbapi:
     api_key_ipdb = args.abuseipdbapi
 else:
     api_key_ipdb = api_verifier.check_abuseip
+
+# Verifica se foi fornecido um arquivo de texto com informações de IPs
+if args.file:
+    TXT_FILE = ler_arquivo(args.file)
+    if TXT_FILE:
+        # Faça o processamento com o array TXT_FILE
+        verify()
+    else:
+        print("Arquivo vazio ou não encontrado.")
 
