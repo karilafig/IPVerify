@@ -16,3 +16,9 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
  <div>
 <img alt="Status" src="https://img.shields.io/badge/In%20Progress-eead2d?style=for-the-badge">
  </div>
+
+# Como usar
+Faça o download do repositório ou clone utilizando o git:
+<pre>
+git clone https://github.com/karilafig/IPVerify.git
+</pre>
