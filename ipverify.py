@@ -44,6 +44,18 @@ def ler_arquivo(caminho):
 
 def verify():
     global TXT_FILE
+    api_verifier = APIVerifier()
+    api_key_vt = api_verifier.check_virustotal_api()
+    api_key_ipdb = api_verifier.check_abuseipdb_api()
+
+    for linha in TXT_FILE:
+        ip = linha.strip()
+        # Testando se as informações chegam
+        print(f"Verificando IP: {ip}")
+        print(f"VirusTotal API Key: {api_key_vt}")
+        print(f"AbuseIPDB API Key: {api_key_ipdb}")
+        print("Realizando a verificação...\n")
+
 
 #----------------------------MENU------------------------------------------------
 
