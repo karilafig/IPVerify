@@ -8,7 +8,7 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
  
 ## Sistemas Operacionais compatíveis 
  <div>
- <img alt="Linux" src="https://img.shields.io/badge/Linux-800000?style=for-the-badge&logo=Linux&logoColor=white">
+ <img alt="Linux" src="https://img.shields.io/badge/Linux-A020F0?style=for-the-badge&logo=Linux&logoColor=white">
  <img alt="Windows" src="https://img.shields.io/badge/Windows-008000?style=for-the-badge&logo=Windows&logoColor=white">
  </div>
  ## Status
