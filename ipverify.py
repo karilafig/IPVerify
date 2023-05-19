@@ -53,15 +53,16 @@ def virustotal(ip,api_key):
 
     if response.status_code == 200:
         json_data = response.json()
-        print('----- IP:'+ ip + '----- ')
-        print('País:'+ response.json()['country'])
         
         detected_urls = response.json()['detected_urls']
         for url in detected_urls:
+                print('IP:'+ ip)
                 print('URL:', url['url'])
                 print('Positives:', url['positives'])
                 print('Total:', url['total'])
-                print('Scan date:', url['scan_date'])
+                print('Data do scan:', url['scan_date'])
+                print('País:'+ response.json()['country'])
+                print('Fonte: Virus Total ')
 
     elif response.status_code == 403:
         print('Acesso negado: verifique a chave de API')
@@ -86,10 +87,17 @@ def abuseipdb(ip, api_key):
 
     response = requests.request(method='GET', url=url, headers=headers, params=querystring)
 
-    # Formatted output
+        # Formatted output
     decodedResponse = json.loads(response.text)
-    print(json.dumps(decodedResponse, sort_keys=True, indent=4))   
-    time.sleep(15)  # Atraso de 15 segundos entre cada chamada
+    data = decodedResponse['data']
+    ip = data['ipAddress']
+    abuseConfidenceScore = data['abuseConfidenceScore']
+    totalReports = data['totalReports']
+
+    print('IP:', ip)
+    print('Score', abuseConfidenceScore)
+    print('Total de reports', totalReports)
+    print('Fonte: AbuseIPDB')
 
 def verify():
     global TXT_FILE
@@ -99,7 +107,7 @@ def verify():
 
     for linha in TXT_FILE:
         ip = linha.strip()
-        #virustotal(ip,api_key_vt)
+        virustotal(ip,api_key_vt)
         abuseipdb(ip,api_key_ipdb)
   
         print("Finalizado...\n")
@@ -129,6 +137,7 @@ if args.abuseipdbapi:
     api_key_ipdb = args.abuseipdbapi
 else:
     api_key_ipdb = api_verifier.check_abuseipdb_api()
+
 
 
 
