@@ -1,6 +1,8 @@
 import time
+import requests
+import re
+import subprocess
 import argparse
-
 print("  ___ ______     __        _  __     ")
 print(" |_ _|  _ \ \   / /__ _ __(_)/ _|_   _ ")
 print("  | || |_) \ \ / / _ \ '__| | |_| | | |")
@@ -42,6 +44,31 @@ def ler_arquivo(caminho):
         print("Arquivo não encontrado.")
         return []
 
+def virustotal(ip,api_key):
+    # Faz a consulta do IP utilizando a API
+    url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
+    params = {'apikey': api_key, 'ip': ip}
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        json_data = response.json()
+        print('----- IP:'+ ip + '----- ')
+        print('País:'+ response.json()['country'])
+        
+        detected_urls = response.json()['detected_urls']
+        for url in detected_urls:
+                print('URL:', url['url'])
+                print('Positives:', url['positives'])
+                print('Total:', url['total'])
+                print('Scan date:', url['scan_date'])
+
+    elif response.status_code == 403:
+        print('Acesso negado: verifique a chave de API')
+    else:
+        print('Erro ao fazer a consulta de IP')
+    
+    time.sleep(15) # Atraso de 15 segundos entre cada chamada
+
 def verify():
     global TXT_FILE
     api_verifier = APIVerifier()
@@ -50,7 +77,7 @@ def verify():
 
     for linha in TXT_FILE:
         ip = linha.strip()
-        # Testando se as informações chegam
+        virustotal(ip,api_key_vt)
         print(f"Verificando IP: {ip}")
         print(f"VirusTotal API Key: {api_key_vt}")
         print(f"AbuseIPDB API Key: {api_key_ipdb}")
@@ -80,7 +107,8 @@ else:
 if args.abuseipdbapi:
     api_key_ipdb = args.abuseipdbapi
 else:
-    api_key_ipdb = api_verifier.check_abuseip
+    api_key_ipdb = api_verifier.check_abuseipdb_api()
+
 
 # Verifica se foi fornecido um arquivo de texto com informações de IPs
 if args.file:
