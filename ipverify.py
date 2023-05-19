@@ -4,6 +4,7 @@ import re
 import subprocess
 import argparse
 import json
+import csv
 print("  ___ ______     __        _  __     ")
 print(" |_ _|  _ \ \   / /__ _ __(_)/ _|_   _ ")
 print("  | || |_) \ \ / / _ \ '__| | |_| | | |")
@@ -45,7 +46,7 @@ def ler_arquivo(caminho):
         print("Arquivo não encontrado.")
         return []
 
-def virustotal(ip,api_key):
+def virustotal(ip, api_key):
     # Faz a consulta do IP utilizando a API
     url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
     params = {'apikey': api_key, 'ip': ip}
@@ -53,23 +54,17 @@ def virustotal(ip,api_key):
 
     if response.status_code == 200:
         json_data = response.json()
-        
         detected_urls = response.json()['detected_urls']
-        for url in detected_urls:
-                print('IP:'+ ip)
-                print('URL:', url['url'])
-                print('Positives:', url['positives'])
-                print('Total:', url['total'])
-                print('Data do scan:', url['scan_date'])
-                print('País:'+ response.json()['country'])
-                print('Fonte: Virus Total ')
+        resultados = []
 
-    elif response.status_code == 403:
-        print('Acesso negado: verifique a chave de API')
-    else:
-        print('Erro ao fazer a consulta de IP')
-    
-    time.sleep(15) # Atraso de 15 segundos entre cada chamada
+        for url in detected_urls:
+            resultado = [ip, url['url'], url['positives'], url['total'], url['scan_date'], response.json()['country'], None, None]
+            resultados.append(resultado)
+
+        return resultados
+
+    return None
+
 
 def abuseipdb(ip, api_key):
     # Defining the api-endpoint
@@ -93,11 +88,15 @@ def abuseipdb(ip, api_key):
     ip = data['ipAddress']
     abuseConfidenceScore = data['abuseConfidenceScore']
     totalReports = data['totalReports']
+    country = data['countryCode']
 
-    print('IP:', ip)
-    print('Score', abuseConfidenceScore)
-    print('Total de reports', totalReports)
-    print('Fonte: AbuseIPDB')
+
+   # print('IP:', ip)
+   # print('País', country)
+   # print('Score', abuseConfidenceScore)
+   # print('Total de reports', totalReports)
+   # print('Fonte: AbuseIPDB')
+    return [ip, None, None, None, None, None, data['abuseConfidenceScore'], data['totalReports']]
 
 def verify():
     global TXT_FILE
@@ -105,12 +104,35 @@ def verify():
     api_key_vt = api_verifier.check_virustotal_api()
     api_key_ipdb = api_verifier.check_abuseipdb_api()
 
+    if not api_key_vt or not api_key_ipdb:
+        print("Erro: As chaves de API não foram fornecidas.")
+        api_key_vt = input("Digite a chave de API do VirusTotal: ")
+        api_key_ipdb = input("Digite a chave de API do AbuseIPDB: ")
+
+    resultados = []
+
     for linha in TXT_FILE:
         ip = linha.strip()
-        virustotal(ip,api_key_vt)
-        abuseipdb(ip,api_key_ipdb)
-  
-        print("Finalizado...\n")
+
+        # Obter informações do VirusTotal
+        resultado_vt = virustotal(ip, api_key_vt)
+        if resultado_vt is not None:
+            resultados.append(resultado_vt)
+
+        # Obter informações do AbuseIPDB
+        resultado_ipdb = abuseipdb(ip, api_key_ipdb)
+        if resultado_ipdb is not None:
+            resultados.append(resultado_ipdb)
+
+    # Salvar resultados em um arquivo CSV
+    arquivo_csv = "resultados.csv"
+    cabecalhos = ["IP", "URL", "Positivos", "Total", "Data do Scan", "País", "Score", "Total de Reports"]
+    with open(arquivo_csv, "w", newline="") as arquivo:
+        escritor_csv = csv.writer(arquivo)
+        escritor_csv.writerow(cabecalhos)
+        escritor_csv.writerows(resultados)
+
+    print("Finalizado. Os resultados foram salvos em resultados.csv.\n")
 
 
 #----------------------------MENU------------------------------------------------
