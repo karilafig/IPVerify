@@ -3,6 +3,7 @@ import requests
 import re
 import subprocess
 import argparse
+import json
 print("  ___ ______     __        _  __     ")
 print(" |_ _|  _ \ \   / /__ _ __(_)/ _|_   _ ")
 print("  | || |_) \ \ / / _ \ '__| | |_| | | |")
@@ -69,6 +70,27 @@ def virustotal(ip,api_key):
     
     time.sleep(15) # Atraso de 15 segundos entre cada chamada
 
+def abuseipdb(ip, api_key):
+    # Defining the api-endpoint
+    url = 'https://api.abuseipdb.com/api/v2/check'
+
+    querystring = {
+        'ipAddress': ip,
+        'maxAgeInDays': '90'
+    }
+
+    headers = {
+        'Accept': 'application/json',
+        'Key': api_key
+    }
+
+    response = requests.request(method='GET', url=url, headers=headers, params=querystring)
+
+    # Formatted output
+    decodedResponse = json.loads(response.text)
+    print(json.dumps(decodedResponse, sort_keys=True, indent=4))   
+    time.sleep(15)  # Atraso de 15 segundos entre cada chamada
+
 def verify():
     global TXT_FILE
     api_verifier = APIVerifier()
@@ -77,11 +99,10 @@ def verify():
 
     for linha in TXT_FILE:
         ip = linha.strip()
-        virustotal(ip,api_key_vt)
-        print(f"Verificando IP: {ip}")
-        print(f"VirusTotal API Key: {api_key_vt}")
-        print(f"AbuseIPDB API Key: {api_key_ipdb}")
-        print("Realizando a verificação...\n")
+        #virustotal(ip,api_key_vt)
+        abuseipdb(ip,api_key_ipdb)
+  
+        print("Finalizado...\n")
 
 
 #----------------------------MENU------------------------------------------------
@@ -108,6 +129,7 @@ if args.abuseipdbapi:
     api_key_ipdb = args.abuseipdbapi
 else:
     api_key_ipdb = api_verifier.check_abuseipdb_api()
+
 
 
 # Verifica se foi fornecido um arquivo de texto com informações de IPs
