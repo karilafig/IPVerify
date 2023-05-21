@@ -23,7 +23,7 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
 
 # Como usar
 Faça o download do repositório ou clone utilizando o git:
-```git
+```
 git clone https://github.com/karilafig/IPVerify.git
 ```
 Acesse o diretório onde se encontra o repositório clonado e execute o script utilizando python:
