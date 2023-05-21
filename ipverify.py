@@ -5,14 +5,17 @@ import subprocess
 import argparse
 import json
 import csv
+
 print("  ___ ______     __        _  __     ")
 print(" |_ _|  _ \ \   / /__ _ __(_)/ _|_   _ ")
 print("  | || |_) \ \ / / _ \ '__| | |_| | | |")
 print("  | ||  __/ \ V /  __/ |  | |  _| |_| | ")
 print(" |___|_|     \_/ \___|_|  |_|_|  \__, |")
 print("                                  |___/")
+
 #----------------------------VARIÁVEIS GLOBAIS------------------------------
 TXT_FILE = []
+
 #----------------------------CLASSE DE VERIFICACAO DE API------------------------------
 class APIVerifier:
     def __init__(self):
@@ -82,7 +85,7 @@ def abuseipdb(ip, api_key):
 
     response = requests.request(method='GET', url=url, headers=headers, params=querystring)
 
-        # Formatted output
+    # Formatted output
     decodedResponse = json.loads(response.text)
     data = decodedResponse['data']
     ip = data['ipAddress']
@@ -90,13 +93,8 @@ def abuseipdb(ip, api_key):
     totalReports = data['totalReports']
     country = data['countryCode']
 
-
-   # print('IP:', ip)
-   # print('País', country)
-   # print('Score', abuseConfidenceScore)
-   # print('Total de reports', totalReports)
-   # print('Fonte: AbuseIPDB')
     return [ip, None, None, None, None, None, data['abuseConfidenceScore'], data['totalReports']]
+
 
 def verify():
     global TXT_FILE
@@ -109,7 +107,8 @@ def verify():
         api_key_vt = input("Digite a chave de API do VirusTotal: ")
         api_key_ipdb = input("Digite a chave de API do AbuseIPDB: ")
 
-    resultados = []
+    resultados_vt = []
+    resultados_ipdb = []
 
     for linha in TXT_FILE:
         ip = linha.strip()
@@ -117,22 +116,24 @@ def verify():
         # Obter informações do VirusTotal
         resultado_vt = virustotal(ip, api_key_vt)
         if resultado_vt is not None:
-            resultados.append(resultado_vt)
+            resultados_vt.extend(resultado_vt)
 
         # Obter informações do AbuseIPDB
         resultado_ipdb = abuseipdb(ip, api_key_ipdb)
         if resultado_ipdb is not None:
-            resultados.append(resultado_ipdb)
+            resultados_ipdb.append(resultado_ipdb)
 
-    # Salvar resultados em um arquivo CSV
-    arquivo_csv = "resultados.csv"
-    cabecalhos = ["IP", "URL", "Positivos", "Total", "Data do Scan", "País", "Score", "Total de Reports"]
-    with open(arquivo_csv, "w", newline="") as arquivo:
-        escritor_csv = csv.writer(arquivo)
-        escritor_csv.writerow(cabecalhos)
-        escritor_csv.writerows(resultados)
+    # Escreve as informações no arquivo CSV para o VirusTotal
+    with open('virustotal_results.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['IP', 'URL', 'Positives', 'Total', 'Scan Date', 'Country', None, None])
+        writer.writerows(resultados_vt)
 
-    print("Finalizado. Os resultados foram salvos em resultados.csv.\n")
+    # Escreve as informações no arquivo CSV para o AbuseIPDB
+    with open('abuseipdb_results.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['IP', None, None, None, None, None, 'Abuse Confidence Score', 'Total Reports'])
+        writer.writerows(resultados_ipdb)
 
 
 #----------------------------MENU------------------------------------------------
@@ -160,9 +161,6 @@ if args.abuseipdbapi:
 else:
     api_key_ipdb = api_verifier.check_abuseipdb_api()
 
-
-
-
 # Verifica se foi fornecido um arquivo de texto com informações de IPs
 if args.file:
     TXT_FILE = ler_arquivo(args.file)
@@ -171,4 +169,3 @@ if args.file:
         verify()
     else:
         print("Arquivo vazio ou não encontrado.")
-
