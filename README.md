@@ -27,6 +27,6 @@ Faça o download do repositório ou clone utilizando o git:
 git clone https://github.com/karilafig/IPVerify.git
 ```
 Acesse o diretório onde se encontra o repositório clonado e execute o script utilizando python:
-<pre>
+```python
 python ipverify.py -vtapi (INSIRA AQUI A CHAVE DE API DO VIRUS TOTAL) -ipdbapi (INSIRA AQUI A CHAVE DE API DO ABUSE IPDB) -f (CAMINHO DO TXT COM OS IPS)
-</pre>
+```
