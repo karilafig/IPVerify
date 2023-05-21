@@ -23,9 +23,9 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
 
 # Como usar
 Faça o download do repositório ou clone utilizando o git:
-<pre>
+```
 git clone https://github.com/karilafig/IPVerify.git
-</pre>
+```
 Acesse o diretório onde se encontra o repositório clonado e execute o script utilizando python:
 <pre>
 python ipverify.py -vtapi (INSIRA AQUI A CHAVE DE API DO VIRUS TOTAL) -ipdbapi (INSIRA AQUI A CHAVE DE API DO ABUSE IPDB) -f (CAMINHO DO TXT COM OS IPS)
