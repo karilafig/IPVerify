@@ -11,11 +11,7 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
  <img alt="Linux" src="https://img.shields.io/badge/Linux-A020F0?style=for-the-badge&logo=Linux&logoColor=white">
  <img alt="Windows" src="https://img.shields.io/badge/Windows-008000?style=for-the-badge&logo=Windows&logoColor=white">
  </div>
- 
- ## Status
- <div>
-<img alt="Status" src="https://img.shields.io/badge/Done-008000?style=for-the-badge">
- </div>
+
 
 # Como usar
 Faça o download do repositório ou clone utilizando o git:
