@@ -1,10 +1,10 @@
-import time
 import requests
 import re
 import subprocess
 import argparse
 import json
 import csv
+import time
 
 print("  ___ ______     __        _  __     ")
 print(" |_ _|  _ \ \   / /__ _ __(_)/ _|_   _ ")
@@ -50,7 +50,6 @@ def ler_arquivo(caminho):
         return []
 
 def virustotal(ip, api_key):
-    # Faz a consulta do IP utilizando a API
     url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
     params = {'apikey': api_key, 'ip': ip}
     response = requests.get(url, params=params)
@@ -61,7 +60,7 @@ def virustotal(ip, api_key):
         resultados = []
 
         for url in detected_urls:
-            resultado = [ip, url['url'], url['positives'], url['total'], url['scan_date'], response.json()['country'], None, None]
+            resultado = [ip, url['url'], url['positives'], url['total'], url['scan_date'], response.json()['country']]
             resultados.append(resultado)
 
         return resultados
@@ -70,7 +69,6 @@ def virustotal(ip, api_key):
 
 
 def abuseipdb(ip, api_key):
-    # Defining the api-endpoint
     url = 'https://api.abuseipdb.com/api/v2/check'
 
     querystring = {
@@ -85,7 +83,7 @@ def abuseipdb(ip, api_key):
 
     response = requests.request(method='GET', url=url, headers=headers, params=querystring)
 
-    # Formatted output
+  
     decodedResponse = json.loads(response.text)
     data = decodedResponse['data']
     ip = data['ipAddress']
@@ -93,19 +91,10 @@ def abuseipdb(ip, api_key):
     totalReports = data['totalReports']
     country = data['countryCode']
 
-    return [ip, None, None, None, None, None, data['abuseConfidenceScore'], data['totalReports']]
+    return [ip, data['abuseConfidenceScore'], data['totalReports']]
 
-
-def verify():
+def verify(api_key_vt, api_key_ipdb):
     global TXT_FILE
-    api_verifier = APIVerifier()
-    api_key_vt = api_verifier.check_virustotal_api()
-    api_key_ipdb = api_verifier.check_abuseipdb_api()
-
-    if not api_key_vt or not api_key_ipdb:
-        print("Erro: As chaves de API não foram fornecidas.")
-        api_key_vt = input("Digite a chave de API do VirusTotal: ")
-        api_key_ipdb = input("Digite a chave de API do AbuseIPDB: ")
 
     resultados_vt = []
     resultados_ipdb = []
@@ -123,24 +112,12 @@ def verify():
         if resultado_ipdb is not None:
             resultados_ipdb.append(resultado_ipdb)
 
-    # Escreve as informações no arquivo CSV para o VirusTotal
-    with open('virustotal_results.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['IP', 'URL', 'Positives', 'Total', 'Scan Date', 'Country', None, None])
-        writer.writerows(resultados_vt)
-
-    # Escreve as informações no arquivo CSV para o AbuseIPDB
-    with open('abuseipdb_results.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['IP', None, None, None, None, None, 'Abuse Confidence Score', 'Total Reports'])
-        writer.writerows(resultados_ipdb)
-
+    return resultados_vt, resultados_ipdb
 
 #----------------------------MENU------------------------------------------------
 
 parser = argparse.ArgumentParser(description="Configuração de chaves de API")
 
-# argumentos
 parser.add_argument("-vtapi", "--virustotalapi", help="Chave de API do VirusTotal")
 parser.add_argument("-ipdbapi", "--abuseipdbapi", help="Chave de API do AbuseIPDB")
 parser.add_argument("-f", "--file", help="Arquivo de texto com informações de IPs")
@@ -166,6 +143,21 @@ if args.file:
     TXT_FILE = ler_arquivo(args.file)
     if TXT_FILE:
         # Faça o processamento com o array TXT_FILE
-        verify()
+        resultados_vt, resultados_ipdb = verify(api_key_vt, api_key_ipdb)
+
+        # Escreve as informações no arquivo CSV para o VirusTotal
+        with open('virustotal_results.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['IP', 'URL', 'Positives', 'Total', 'Scan Date', 'Country'])
+            writer.writerows(resultados_vt)
+            print("Arquivo csv 'virustotal_results.csv' gerado.")
+
+        # Escreve as informações no arquivo CSV para o AbuseIPDB
+        with open('abuseipdb_results.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['IP', 'Abuse Score', 'Total Reports'])
+            writer.writerows(resultados_ipdb)
+            print("Arquivo csv 'abuseipdb_results.csv' gerado.")
+
     else:
         print("Arquivo vazio ou não encontrado.")
