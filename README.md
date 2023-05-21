@@ -14,7 +14,7 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
  
  ## Status
  <div>
-<img alt="Status" src="https://img.shields.io/badge/In%20Progress-eead2d?style=for-the-badge">
+<img alt="Status" src="https://img.shields.io/badge/Done-008000?style=for-the-badge">
  </div>
 
 # Como usar
