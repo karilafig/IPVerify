@@ -9,7 +9,7 @@
 
 Ferramenta de checagem de reputação de endereços IP utilizando as bases do Virus Total e AbuseIPDB.
 <div>
-  <img alt="lastcommit" src="https://img.shields.io/github/last-commit/karilafig/IPVerify?style=for-the-badge&logo=appveyor>
+  <img alt="lastcommit" src="https://img.shields.io/github/last-commit/karilafig/IPVerify?style=for-the-badge&logo=appveyor">
   </div>
 
 ## Tecnologias utilizadas
