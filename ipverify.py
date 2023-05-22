@@ -45,7 +45,7 @@ def ler_arquivo(caminho):
         with open(caminho, "r") as arquivo:
             return arquivo.readlines()
     except FileNotFoundError:
-        print("Arquivo não encontrado.")
+        print("Arquivo não encontrado")
         return []
 
 def virustotal(ip, api_key):
