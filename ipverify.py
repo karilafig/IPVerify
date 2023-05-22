@@ -81,7 +81,7 @@ def abuseipdb(ip, api_key):
         'Key': api_key
     }
 
-    response = requests.request(method='GET', url=url, headers=headers, params=querystring)
+    response = requests.request(method='GET', url=url, headers=headers, params=querystring, verify=False)
 
   
     decodedResponse = json.loads(response.text)
