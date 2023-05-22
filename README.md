@@ -23,7 +23,8 @@ Ferramenta de checagem de reputação de endereços IP utilizando as bases do Vi
  <img alt="Windows" src="https://img.shields.io/badge/Windows-008000?style=for-the-badge&logo=Windows&logoColor=white">
  </div>
 
-
+# Pré requisito
+Python 3.x
 # Como usar
 Faça o download do repositório ou clone utilizando o git:
 ```
