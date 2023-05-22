@@ -14,13 +14,9 @@ print('\033[1;95m |___|_|     \_/ \___|_|  |_|_|  \__, |\033[0m')
 print('\033[1;95m                                  |___/\033[0m')
 
 
-
-
-
-#----------------------------VARIÁVEIS GLOBAIS------------------------------
 TXT_FILE = []
 requests.packages.urllib3.disable_warnings()
-#----------------------------CLASSE DE VERIFICACAO DE API------------------------------
+
 class APIVerifier:
     def __init__(self):
         self.api_key_vt = ""
@@ -44,7 +40,6 @@ class APIVerifier:
         self.last_update_ipdb = time.time()
         return self.api_key_ipdb
 
-#----------------------------FUNCOES---------------------------------------------
 def ler_arquivo(caminho):
     try:
         with open(caminho, "r") as arquivo:
@@ -106,19 +101,18 @@ def verify(api_key_vt, api_key_ipdb):
     for linha in TXT_FILE:
         ip = linha.strip()
 
-        # Obter informações do VirusTotal
         resultado_vt = virustotal(ip, api_key_vt)
         if resultado_vt is not None:
             resultados_vt.extend(resultado_vt)
 
-        # Obter informações do AbuseIPDB
+     
         resultado_ipdb = abuseipdb(ip, api_key_ipdb)
         if resultado_ipdb is not None:
             resultados_ipdb.append(resultado_ipdb)
 
     return resultados_vt, resultados_ipdb
 
-#----------------------------MENU------------------------------------------------
+
 
 parser = argparse.ArgumentParser(description="Configuração de chaves de API")
 
@@ -130,33 +124,33 @@ args = parser.parse_args()
 
 api_verifier = APIVerifier()
 
-# Verifica se foi fornecida a chave de API do VirusTotal
+
 if args.virustotalapi:
     api_key_vt = args.virustotalapi
 else:
     api_key_vt = api_verifier.check_virustotal_api()
 
-# Verifica se foi fornecida a chave de API do AbuseIPDB
+
 if args.abuseipdbapi:
     api_key_ipdb = args.abuseipdbapi
 else:
     api_key_ipdb = api_verifier.check_abuseipdb_api()
 
-# Verifica se foi fornecido um arquivo de texto com informações de IPs
+
 if args.file:
     TXT_FILE = ler_arquivo(args.file)
     if TXT_FILE:
-        # Faça o processamento com o array TXT_FILE
+     
         resultados_vt, resultados_ipdb = verify(api_key_vt, api_key_ipdb)
 
-        # Escreve as informações no arquivo CSV para o VirusTotal
+       
         with open('virustotal_results.csv', 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['IP', 'URL', 'Positives', 'Total', 'Scan Date', 'Country'])
             writer.writerows(resultados_vt)
             print("Arquivo csv 'virustotal_results.csv' gerado.")
 
-        # Escreve as informações no arquivo CSV para o AbuseIPDB
+ 
         with open('abuseipdb_results.csv', 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['IP', 'Abuse Score', 'Total Reports'])
