@@ -56,7 +56,7 @@ def ler_arquivo(caminho):
 def virustotal(ip, api_key):
     url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
     params = {'apikey': api_key, 'ip': ip}
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, verify=False)
 
     if response.status_code == 200:
         json_data = response.json()
