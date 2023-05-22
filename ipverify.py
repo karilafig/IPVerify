@@ -19,7 +19,7 @@ print('\033[1;95m                                  |___/\033[0m')
 
 #----------------------------VARIÁVEIS GLOBAIS------------------------------
 TXT_FILE = []
-
+requests.packages.urllib3.disable_warnings()
 #----------------------------CLASSE DE VERIFICACAO DE API------------------------------
 class APIVerifier:
     def __init__(self):
@@ -165,3 +165,4 @@ if args.file:
 
     else:
         print("Arquivo vazio ou não encontrado.")
+
