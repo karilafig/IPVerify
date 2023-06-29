@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import requests
 import re
 import subprocess
@@ -13,7 +13,6 @@ print('\033[1;95m  | || |_) \ \ / / _ \ \'__| | |_| | | |\033[0m')
 print('\033[1;95m  | ||  __/ \ V /  __/ |  | |  _| |_| |\033[0m')
 print('\033[1;95m |___|_|     \_/ \___|_|  |_|_|  \__, |\033[0m')
 print('\033[1;95m                                  |___/\033[0m')
-
 
 TXT_FILE = []
 requests.packages.urllib3.disable_warnings()
@@ -50,23 +49,30 @@ def ler_arquivo(caminho):
         return []
 
 def virustotal(ip, api_key):
-    url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
-    params = {'apikey': api_key, 'ip': ip}
-    response = requests.get(url, params=params, verify=False)
+    url = f'https://www.virustotal.com/api/v3/ip_addresses/{ip}'
+
+    headers = {
+        "Accept": "application/json",
+        "x-apikey": api_key
+    }
+
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
-        json_data = response.json()
-        detected_urls = response.json()['detected_urls']
-        resultados = []
+        data = response.json()
+        return [
+            ip,
+            data['data']['attributes']['country'],
+            data['data']['attributes']['last_analysis_stats']['harmless'],
+            data['data']['attributes']['last_analysis_stats']['malicious'],
+            data['data']['attributes']['last_analysis_stats']['suspicious'],
+            data['data']['attributes']['last_analysis_stats']['undetected'],
+            data['data']['attributes']['last_analysis_stats']['timeout'],
+            data['data']['attributes']['asn'],
+            data['data']['attributes']['as_owner'],
+            
 
-        for url in detected_urls:
-            resultado = [ip, url['url'], url['positives'], url['total'], url['scan_date'], response.json()['country']]
-            resultados.append(resultado)
-
-        return resultados
-
-    return None
-
+        ]
 
 def abuseipdb(ip, api_key):
     url = 'https://api.abuseipdb.com/api/v2/check'
@@ -83,7 +89,6 @@ def abuseipdb(ip, api_key):
 
     response = requests.request(method='GET', url=url, headers=headers, params=querystring, verify=False)
 
-  
     decodedResponse = json.loads(response.text)
     data = decodedResponse['data']
     ip = data['ipAddress']
@@ -91,7 +96,7 @@ def abuseipdb(ip, api_key):
     totalReports = data['totalReports']
     country = data['countryCode']
 
-    return [ip, data['abuseConfidenceScore'], data['totalReports']]
+    return [ip, data['abuseConfidenceScore'], data['totalReports'], country]
 
 def verify(api_key_vt, api_key_ipdb):
     global TXT_FILE
@@ -104,16 +109,13 @@ def verify(api_key_vt, api_key_ipdb):
 
         resultado_vt = virustotal(ip, api_key_vt)
         if resultado_vt is not None:
-            resultados_vt.extend(resultado_vt)
+            resultados_vt.append(resultado_vt)
 
-     
         resultado_ipdb = abuseipdb(ip, api_key_ipdb)
         if resultado_ipdb is not None:
             resultados_ipdb.append(resultado_ipdb)
 
     return resultados_vt, resultados_ipdb
-
-
 
 parser = argparse.ArgumentParser(description="Configuração de chaves de API")
 
@@ -125,39 +127,33 @@ args = parser.parse_args()
 
 api_verifier = APIVerifier()
 
-
 if args.virustotalapi:
     api_key_vt = args.virustotalapi
 else:
     api_key_vt = api_verifier.check_virustotal_api()
-
 
 if args.abuseipdbapi:
     api_key_ipdb = args.abuseipdbapi
 else:
     api_key_ipdb = api_verifier.check_abuseipdb_api()
 
-
 if args.file:
     TXT_FILE = ler_arquivo(args.file)
     if TXT_FILE:
-     
         resultados_vt, resultados_ipdb = verify(api_key_vt, api_key_ipdb)
 
-       
         with open('virustotal_results.csv', 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['IP', 'URL', 'Positives', 'Total', 'Scan Date', 'Country'])
-            writer.writerows(resultados_vt)
+            writer.writerow(['IP', 'country', 'harmless', 'malicious', 'suspicious', 'undetected', 'timeout', 'ASN', "AS OWNER"])
+            for resultado in resultados_vt:
+                writer.writerow(resultado)
             print("Arquivo csv 'virustotal_results.csv' gerado.")
 
- 
+
         with open('abuseipdb_results.csv', 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['IP', 'Abuse Score', 'Total Reports'])
+            writer.writerow(['IP', 'Abuse Score', 'Total Reports', 'Country'])
             writer.writerows(resultados_ipdb)
             print("Arquivo csv 'abuseipdb_results.csv' gerado.")
-
     else:
         print("Arquivo vazio ou não encontrado.")
-
