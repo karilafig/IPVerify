@@ -56,7 +56,7 @@ def virustotal(ip, api_key):
         "x-apikey": api_key
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, verify=False)
 
     if response.status_code == 200:
         data = response.json()
